@@ -27,6 +27,9 @@ dependencies {
     //compile 'com.okta.jwt:okta-jwt-verifier:0.4.1-SNAPSHOT'
     //runtime 'com.okta.jwt:okta-jwt-verifier-impl:0.4.1-SNAPSHOT'
     compile 'com.nimbusds:oauth2-oidc-sdk:6.9'
+    compile 'com.nimbusds:nimbus-jose-jwt:6.0.1'
+    compile 'com.googlecode.json-simple:json-simple:1.1.1'
     shadow 'org.spigotmc:spigot-api:1.14-R0.1-SNAPSHOT'
     shadow 'net.milkbowl.vault:VaultAPI:1.7'
+
 }

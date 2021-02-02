@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 
-public class PlayerFollowEvent extends PlayerEvent {
+public class PlayerFollowEvent extends TwitchEvent {
   private static final HandlerList handlers = new HandlerList();
 
   private int channelId;
@@ -14,7 +14,7 @@ public class PlayerFollowEvent extends PlayerEvent {
    *
    * @param who The player who subscribed
    */
-  public PlayerFollowEvent(Player who, int channelId) {
+  public PlayerFollowEvent(String who, int channelId) {
     super(who);
     this.channelId = channelId;
   }

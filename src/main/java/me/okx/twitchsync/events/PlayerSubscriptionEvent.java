@@ -1,12 +1,12 @@
 package me.okx.twitchsync.events;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 
-public class PlayerSubscriptionEvent extends PlayerEvent {
+public class PlayerSubscriptionEvent extends TwitchEvent {
   private static final HandlerList handlers = new HandlerList();
-
   private int channelId;
 
   /**
@@ -14,7 +14,7 @@ public class PlayerSubscriptionEvent extends PlayerEvent {
    *
    * @param who The player who subscribed
    */
-  public PlayerSubscriptionEvent(Player who, int channelId) {
+  public PlayerSubscriptionEvent(String who, int channelId) {
     super(who);
     this.channelId = channelId;
   }

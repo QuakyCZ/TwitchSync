@@ -3,6 +3,7 @@ package me.okx.twitchsync;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -25,17 +26,19 @@ public class TwitchSyncCommand implements CommandExecutor {
 
     Player player = (Player) cs;
 
+    plugin.getSqlHelper().addPlayer(player.getUniqueId(),player.getName());
+
     String url = plugin.getValidator().createAuthenticationUrl(player.getUniqueId());
     if(url == null) {
-      player.sendMessage(ChatColor.RED + "An error occurred. Please try again.");
+      player.sendMessage(ChatColor.translateAlternateColorCodes('&',plugin.getConfig().getString("messages.error")));
       return true;
     }
 
-    player.spigot().sendMessage(new ComponentBuilder("Click this text to sync to Twitch")
-        .color(net.md_5.bungee.api.ChatColor.GREEN)
-        .event(new ClickEvent(ClickEvent.Action.OPEN_URL, url))
-        .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to sync to Twitch").create()))
-        .create());
+    TextComponent textComponent = new TextComponent(ChatColor.translateAlternateColorCodes('&',plugin.getConfig().getString("messages.link-message")));
+
+     textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
+     textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to sync to Twitch").create()));
+     player.spigot().sendMessage(textComponent);
 
     return true;
   }

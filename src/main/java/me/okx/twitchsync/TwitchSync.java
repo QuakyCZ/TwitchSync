@@ -32,8 +32,10 @@ public class TwitchSync extends JavaPlugin {
     getCommand("twitchsync").setExecutor(new TwitchSyncCommand(this));
     getCommand("revoke").setExecutor(new RevokeCommand(this));
 
-    long time = 20*86400*getConfig().getInt("revoke-interval-days");
-    new Revoker(this).runTaskTimerAsynchronously(this, time, time);
+    if(getConfig().getBoolean("enable-revoke-scheduled-task")) {
+      long time = 20 * 86400 * getConfig().getInt("revoke-interval-days");
+      new Revoker(this).runTaskTimerAsynchronously(this, time, time);
+    }
 
     new Metrics(this);
   }

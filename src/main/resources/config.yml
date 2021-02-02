@@ -17,8 +17,17 @@ redirect-uri: http://localhost:8080
 # How many minutes it takes for twitch sync URLs to expire.
 expiry-time: 10
 
+mysql:
+  host: localhost
+  port: 3306
+  user: root
+  password: pwd
+  database: twitchsync
+
 # Note that these messages are sent by the web server and use HTML, not chat formatting.
 messages:
+  link-message: "Click this text to sync to Twitch."
+  error: "An error occurred. Please try again."
   subscription:
     no-subscription-program: "The channel does not have a subscription program set up."
     success: "You have successfully received the Twitch subscription rewards."
@@ -39,6 +48,7 @@ messages:
 
 # revoke subscriber/follow rewards every X days
 # this will remove the rank and run revoke-commands
+enable-revoke-scheduled-task: true
 revoke-interval-days: 1
 
 # What to do when somebody subscribes
@@ -62,6 +72,12 @@ subscribe:
   # this only supports the %name% placeholder
   revoke-commands:
   - 'give %name% dirt 1'
+
+  messages:
+  - '%channel% has new subscriber %name%!'
+
+  revoke-messages:
+  - '%name% is no longer subscriber of %channel%'
 # What to do when somebody follows
 follow:
   enabled: true

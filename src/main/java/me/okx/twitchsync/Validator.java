@@ -117,11 +117,7 @@ public class Validator {
       return new SyncResponseFailure(SyncMessage.UNKNOWN_ERROR);
     }
 
-    Player user = Bukkit.getPlayer(uuid);
-
-    if (user == null) {
-      return new SyncResponseFailure(SyncMessage.PLAYER_NOT_FOUND);
-    }
+    String playerName = plugin.getSqlHelper().getPlayerName(uuid);
 
     AccessToken token;
     try {
@@ -143,10 +139,11 @@ public class Validator {
         } else {
           Bukkit.getScheduler().runTask(plugin, () ->
               Bukkit.getPluginManager().callEvent(
-                  new PlayerSubscriptionEvent(user, subscriptionMessage.getChannelId().get())));
+                  new PlayerSubscriptionEvent(playerName, subscriptionMessage.getChannelId().get())));
           plugin.getSqlHelper().setSubscribed(uuid, true);
         }
       }
+
 
       MessageWithId followingMessage = getFollowingMessage(userId, token);
       if (followingMessage.getMessage() == SyncMessage.FOLLOW_SUCCESS) {
@@ -155,7 +152,7 @@ public class Validator {
         } else {
           Bukkit.getScheduler().runTask(plugin, () ->
               Bukkit.getPluginManager().callEvent(
-                  new PlayerFollowEvent(user, followingMessage.getChannelId().get())));
+                  new PlayerFollowEvent(playerName, followingMessage.getChannelId().get())));
           plugin.getSqlHelper().setFollowing(uuid, true);
         }
       }

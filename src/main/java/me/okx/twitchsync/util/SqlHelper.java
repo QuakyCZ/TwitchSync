@@ -19,22 +19,29 @@ import java.util.concurrent.CompletableFuture;
 
 public class SqlHelper {
   private Connection connection;
-
+  TwitchSync plugin;
   public SqlHelper(TwitchSync plugin) {
+    this.plugin = plugin;
     Path db = plugin.debug(plugin.getDataFolder().toPath().resolve("synced.db"), "DB");
-
+    String host = plugin.getConfig().getConfigurationSection("mysql").getString("host");
+    String port = plugin.getConfig().getConfigurationSection("mysql").getString("port");
+    String user = plugin.getConfig().getConfigurationSection("mysql").getString("user");
+    String password = plugin.getConfig().getConfigurationSection("mysql").getString("password");
+    String database = plugin.getConfig().getConfigurationSection("mysql").getString("database");
     CompletableFuture.runAsync(() -> {
       try {
-        connection = DriverManager.getConnection("jdbc:sqlite:" + db);
+        connection = DriverManager.getConnection("jdbc:mysql://" + host + "/" + database + "?user=" + user + "&password="+password);
 
         Statement stmt = connection.createStatement();
+        stmt.execute("CREATE TABLE IF NOT EXISTS players (uuid VARCHAR(36) PRIMARY KEY, p_name VARCHAR(50) NOT NULL)");
+        stmt.execute("CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTO_INCREMENT, message VARCHAR(255) )");
         stmt.execute("CREATE TABLE IF NOT EXISTS subscribed (uuid VARCHAR(36) PRIMARY KEY)");
         stmt.execute("CREATE TABLE IF NOT EXISTS following  (uuid VARCHAR(36) PRIMARY KEY)");
         stmt.execute("CREATE TABLE IF NOT EXISTS tokens " +
             "(uuid VARCHAR(36) PRIMARY KEY, " +
             "id VARCHAR(12), " +
             "access_token VARCHAR(32), " +
-            "refresh_token VARCHAR(48))");
+            "refresh_token TEXT)");
       } catch (SQLException e) {
         e.printStackTrace();
       }
@@ -61,6 +68,47 @@ public class SqlHelper {
     } catch (SQLException e) {
       e.printStackTrace();
       return Optional.empty();
+    }
+  }
+
+  public void addMessage(String message) {
+    CompletableFuture.runAsync(() -> {
+      try(PreparedStatement stmt = connection.prepareStatement(
+              "INSERT INTO messages (message) VALUES (?)")) {
+        stmt.setString(1, message);
+        stmt.execute();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+    });
+  }
+
+  public void addPlayer(UUID uuid, String name) {
+    plugin.getLogger().info("Adding " + name + " into database.");
+    if(getPlayerName(uuid)!=null) return;
+
+    try(PreparedStatement stmt = connection.prepareStatement(
+            "INSERT INTO players (uuid,p_name) VALUES (?,?)")) {
+      stmt.setString(1,uuid.toString());
+      stmt.setString(2,name);
+      stmt.execute();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  public String getPlayerName(UUID uuid) {
+    try(PreparedStatement stmt = connection.prepareStatement(
+            "SELECT p_name FROM players WHERE uuid=?")) {
+      stmt.setString(1,uuid.toString());
+      ResultSet result = stmt.executeQuery();
+      if(result.next()){
+        return result.getString("p_name");
+      }
+      return null;
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
     }
   }
 

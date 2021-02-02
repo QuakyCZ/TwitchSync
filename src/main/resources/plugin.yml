@@ -1,8 +1,8 @@
 name: TwitchSync
 main: me.okx.twitchsync.TwitchSync
-version: 1.4.2
+version: 1.4.3
 
-author: Okx
+authors: [Okx, QuakyCZ]
 description: Give rewards to Twitch subscribers or followers.
 
 softdepend: [Vault]
